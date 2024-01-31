@@ -15,8 +15,8 @@ source "tart-cli" "tart" {
   cpu_count    = 4
   memory_gb    = 8
   disk_size_gb = 40
-  ssh_password = "admin"
-  ssh_username = "admin"
+  ssh_password = "relops"
+  ssh_username = "relops"
   ssh_timeout  = "120s"
   boot_command = [
     # hello, hola, bonjour, etc.
@@ -117,8 +117,22 @@ build {
       // Note that this only works if the user is logged-in,
       // i.e. not on login screen.
       "sysadminctl -screenLock off -password admin",
-      "defaults -currentHost write com.apple.screensaver idleTime 0"
+      "defaults -currentHost write com.apple.screensaver idleTime 0",
       //
+      // Install Puppet agent
+      "curl https://downloads.puppetlabs.com/mac/puppet7/13/arm64/puppet-agent-7.26.0-1.osx13.dmg -o /Users/Shared/puppet.dmg",
+      "sudo hdiutil attach /Users/Shared/puppet.dmg",
+      "sudo installer -package /Volumes/puppet-agent-7.26.0-1.osx13/puppet-agent-7.26.0-1-installer.pkg -target /",
+      //
+      // Install Xcode CLI Tools
+      "curl https://ronin-puppet-package-repo.s3.us-west-2.amazonaws.com/macos/public/common/xcode_cli_tools.sh -o /Users/Shared/xcode_cli_tools.sh",
+      "sudo chmod +x /Users/Shared/xcode_cli_tools.sh",
+      "sudo cd /Users/Shared",
+      "sudo ./xcode_cli_tools.sh",
+      //
+      // Clone ronin_puppet
+      "sudo cd /Users/Shared",
+      "sudo git clone git@github.com:mozilla-platform-ops/ronin_puppet.git"
     ]
   }
 }
