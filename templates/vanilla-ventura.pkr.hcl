@@ -134,7 +134,7 @@ build {
       "sudo rm /Users/Shared/xcode_cli_tools.sh",
       //
       // Clone ronin_puppet
-      "sudo cd /Users/Shared/ && sudo git clone git@github.com:mozilla-platform-ops/ronin_puppet.git"
+      "sudo cd /Users/Shared/ && sudo git clone https://github.com/mozilla-platform-ops/ronin_puppet.git"
     ]
   }
 }
