@@ -10,13 +10,14 @@ packer {
 source "tart-cli" "tart" {
   # You can find macOS IPSW URLs on various websites like https://ipsw.me/
   # and https://www.theiphonewiki.com/wiki/Beta_Firmware/Mac/13.x
+  # You can set the line below to a local directory also to avoid re-downloading each time
   from_ipsw    = "https://updates.cdn-apple.com/2023SummerFCS/fullrestores/042-25658/2D6BE8DB-5549-4F85-8C54-39FC23BABC68/UniversalMac_13.5.1_22G90_Restore.ipsw"
   vm_name      = "vm-runner"
   cpu_count    = 4
   memory_gb    = 8
   disk_size_gb = 40
-  ssh_password = "relops"
-  ssh_username = "relops"
+  ssh_password = "admin"
+  ssh_username = "admin"
   ssh_timeout  = "120s"
   boot_command = [
     # hello, hola, bonjour, etc.
@@ -123,16 +124,17 @@ build {
       "curl https://downloads.puppetlabs.com/mac/puppet7/13/arm64/puppet-agent-7.26.0-1.osx13.dmg -o /Users/Shared/puppet.dmg",
       "sudo hdiutil attach /Users/Shared/puppet.dmg",
       "sudo installer -package /Volumes/puppet-agent-7.26.0-1.osx13/puppet-agent-7.26.0-1-installer.pkg -target /",
+      "sudo hdiutil detach /Volumes/puppet-agent-7.26.0-1.osx13",
+      "sudo rm /Users/Shared/puppet.dmg",
       //
       // Install Xcode CLI Tools
       "curl https://ronin-puppet-package-repo.s3.us-west-2.amazonaws.com/macos/public/common/xcode_cli_tools.sh -o /Users/Shared/xcode_cli_tools.sh",
       "sudo chmod +x /Users/Shared/xcode_cli_tools.sh",
-      "sudo cd /Users/Shared",
-      "sudo ./xcode_cli_tools.sh",
+      "sudo /Users/Shared/xcode_cli_tools.sh",
+      "sudo rm /Users/Shared/xcode_cli_tools.sh",
       //
       // Clone ronin_puppet
-      "sudo cd /Users/Shared",
-      "sudo git clone git@github.com:mozilla-platform-ops/ronin_puppet.git"
+      "sudo cd /Users/Shared/ && sudo git clone git@github.com:mozilla-platform-ops/ronin_puppet.git"
     ]
   }
 }
