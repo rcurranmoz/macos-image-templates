@@ -11,7 +11,7 @@ source "tart-cli" "tart" {
   # You can find macOS IPSW URLs on various websites like https://ipsw.me/
   # and https://www.theiphonewiki.com/wiki/Beta_Firmware/Mac/13.x
   # You can set the line below to a local directory also to avoid re-downloading each time
-  from_ipsw    = "https://updates.cdn-apple.com/2023SummerFCS/fullrestores/042-25658/2D6BE8DB-5549-4F85-8C54-39FC23BABC68/UniversalMac_13.5.1_22G90_Restore.ipsw"
+  from_ipsw    = "/Users/Shared/UniversalMac_13.5.1_22G90_Restore.ipsw"
   vm_name      = "vm-runner"
   cpu_count    = 4
   memory_gb    = 8
@@ -23,7 +23,7 @@ source "tart-cli" "tart" {
     # hello, hola, bonjour, etc.
     "<wait60s><spacebar>",
     # Language
-    "<wait30s>english<enter>",
+    "<wait30s>italiano<esc>english<enter>",
     # Select Your Country and Region
     "<wait30s>united states<leftShiftOn><tab><leftShiftOff><spacebar>",
     # Written and Spoken Languages
@@ -133,8 +133,15 @@ build {
       "sudo /Users/Shared/xcode_cli_tools.sh",
       "sudo rm /Users/Shared/xcode_cli_tools.sh",
       //
+      // Install Rosetta
+      "sudo /usr/sbin/softwareupdate --install-rosetta --agree-to-license",
+      //
       // Clone ronin_puppet
-      "sudo cd /Users/Shared/ && sudo git clone https://github.com/mozilla-platform-ops/ronin_puppet.git"
+      "sudo cd /Users/Shared/ && sudo git clone git@github.com:mozilla-platform-ops/ronin_puppet.git",
+      //
+      // Set Hostname
+      "sudo scutil --set HostName vm-runner-1.local"
+      //
     ]
   }
 }
