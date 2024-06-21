@@ -88,8 +88,6 @@ build {
       // Enable passwordless sudo
       "echo admin | sudo -S sh -c \"mkdir -p /etc/sudoers.d/; echo 'admin ALL=(ALL) NOPASSWD: ALL' | EDITOR=tee visudo /etc/sudoers.d/admin-nopasswd\"",
       // Enable auto-login
-      //
-      // See https://github.com/xfreebird/kcpassword for details.
       "echo '00000000: 1ced 3f4a bcbc ba2c caca 4e82' | sudo xxd -r - /etc/kcpassword",
       "sudo defaults write /Library/Preferences/com.apple.loginwindow autoLoginUser admin",
       // Disable screensaver at login screen
@@ -109,10 +107,19 @@ build {
       // Enable Safari's remote automation
       "sudo safaridriver --enable",
       // Disable screen lock
-      //
-      // Note that this only works if the user is logged-in,
-      // i.e. not on login screen.
-      "sysadminctl -screenLock off -password admin",
+      "sysadminctl -screenLock off -password admin"
+    ]
+  }
+
+  provisioner "file" {
+    source      = "./install_generic_worker.sh"
+    destination = "/tmp/install_generic_worker.sh"
+  }
+
+  provisioner "shell" {
+    inline = [
+      "chmod +x /tmp/install_generic_worker.sh",
+      "sudo /tmp/install_generic_worker.sh"
     ]
   }
 }
