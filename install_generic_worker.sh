@@ -56,7 +56,7 @@ done
 # /etc/generic-worker/ed25519_key, and the public key will be written to standard out. 
 # Keep a copy of the public key if you wish to validate artifact signatures.
 mkdir -p /etc/generic-worker
-/usr/local/bin/generic-worker new-ed25519-keypair --file /etc/generic-worker/ed25519_key
+/usr/local/bin/generic-worker-multiuser new-ed25519-keypair --file /etc/generic-worker/ed25519_key
 
 # Create the /usr/local/bin/run-generic-worker.sh script
 cat << 'EOF' > /usr/local/bin/run-generic-worker.sh
