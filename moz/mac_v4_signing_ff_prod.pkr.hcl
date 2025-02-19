@@ -12,7 +12,8 @@ packer {
 }
 
 source "tart-cli" "tart" {
-  from_ipsw    = "/Users/admin/Downloads/UniversalMac_14.6_23G80_Restore.ipsw"
+  # This can change to a local directory for testing  
+  from_ipsw    = "https://updates.cdn-apple.com/2024SummerFCS/fullrestores/052-69922/F5DA2B64-25EB-4370-9E89-FA5689859796/UniversalMac_14.6_23G80_Restore.ipsw
   vm_name      = "sonoma-signer"
   cpu_count    = 4
   memory_gb    = 8
