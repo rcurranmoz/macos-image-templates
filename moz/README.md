@@ -1,6 +1,12 @@
 # **macOS Image Builder using Packer, Tart, and Cilicon**
 This repository provides an automated way to **build macOS virtual machine images** using **Packer, Tart, and Cilicon**. It provisions a macOS VM with **Xcode, Puppet, and SignerBootstrap**, installs dependencies from **AWS S3**, and runs **bootstrap_mojave.sh** for further system setup.
 
+This setup is currently highly experimental and specifically fine-tuned for provisioning a signer with the mac_v4_signing_ff_prod Puppet role. However, with minor adjustments, this approach can be extended to support other signer roles as needed.
+
+Since Puppet determines role assignments based on the value in /etc/puppet_role, adapting this setup for different roles would only require a small configuration change to set the appropriate role on disk before convergence.
+
+The next goal is to extend this setup to provision a working macOS 14 (mac14) image for testers. This will involve adapting the current provisioning workflow to ensure compatibility with mac14 hardware, refining Puppet role assignments, and optimizing the image for test automation.
+
 ## **🚀 Features**
 ✅ **Uses Packer + Tart to create macOS VM images**  
 ✅ **Automates macOS Setup Assistant screens**  
