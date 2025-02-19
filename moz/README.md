@@ -126,8 +126,3 @@ puppet --version
 - ✅ Explore moving to **QEMU or another virtualization platform**  
 
 ---
-
-## **🚀 Summary**
-This setup allows you to **automatically build macOS VM images** with Packer and **deploy them using Tart**. It ensures **Xcode, Puppet, and SignerBootstrap are installed from S3**, runs **bootstrap_mojave.sh**, and provides **a fully automated macOS VM provisioning workflow**.
-
-🚀 **You're now set up with a production-ready macOS CI/CD system!** Let me know if you need any refinements. 🎉
