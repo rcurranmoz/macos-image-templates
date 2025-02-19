@@ -1,5 +1,5 @@
-# **macOS Image Builder using Packer, Tart, and Cilicon**
-This repository provides an automated way to **build macOS virtual machine images** using **Packer, Tart, and Cilicon**. It provisions a macOS VM with **Xcode, Puppet, and SignerBootstrap**, installs dependencies from **AWS S3**, and runs **bootstrap_mojave.sh** for further system setup.
+# **macOS Image Builder using Packer and Tart
+This repository provides an automated way to **build macOS virtual machine images** using **Packer and Tart**. It provisions a macOS VM with **Xcode, Puppet, and SignerBootstrap**, installs dependencies from **AWS S3**, and runs **bootstrap_mojave.sh** for further system setup.
 
 This setup is currently highly experimental and specifically fine-tuned for provisioning a signer with the mac_v4_signing_ff_prod Puppet role. However, with minor adjustments, this approach can be extended to support other signer roles as needed.
 
@@ -39,12 +39,6 @@ brew install tart
 Ensure **Tart is working**:
 ```sh
 tart --version
-```
-
-### **4️⃣ Install Cilicon (Optional)**
-If using **Cilicon for managing Tart images**, install it:
-```sh
-brew install cirruslabs/cli/cilicon
 ```
 
 ### **5️⃣ Prepare Vault Configuration**
