@@ -148,7 +148,7 @@ build {
       "chmod +x /tmp/bootstrap_mojave.sh",
 
       # Run the bootstrap script as the last step
-      # At prsent this fails the first run but the retry
+      # At present this fails the first run but the retry
       # timeout is 60 seconds. It will succeed the second run
       "echo 'Running bootstrap_mojave.sh...'",
       "echo admin | sudo -S /tmp/bootstrap_mojave.sh"
