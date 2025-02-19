@@ -5,7 +5,7 @@ This setup is currently highly experimental and specifically fine-tuned for prov
 
 Since Puppet determines role assignments based on the value in /etc/puppet_role, adapting this setup for different roles would only require a small configuration change to set the appropriate role on disk before convergence.
 
-The next goal is to extend this setup to provision a working macOS 14 (mac14) image for testers. This will involve adapting the current provisioning workflow to ensure compatibility with mac14 hardware, refining Puppet role assignments, and optimizing the image for test automation.
+The next goal is to extend this setup to provision a working macOS 14 image for testers.
 
 ## **🚀 Features**
 ✅ **Uses Packer + Tart to create macOS VM images**  
