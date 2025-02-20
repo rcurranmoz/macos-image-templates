@@ -21,7 +21,7 @@ The next goal is to extend this setup to provision a working macOS 14 image for 
 ### **1️⃣ Install Packer**
 Ensure you have **Packer installed**:
 ```sh
-brew install packer
+brew install hashicorp/tap/packer
 ```
 
 ### **2️⃣ Install Required Packer Plugins**
@@ -34,7 +34,7 @@ packer plugins install github.com/cirruslabs/tart
 ### **3️⃣ Install Tart**
 Tart is required to run macOS virtual machines:
 ```sh
-brew install tart
+brew install cirruslabs/cli/tart
 ```
 Ensure **Tart is working**:
 ```sh
