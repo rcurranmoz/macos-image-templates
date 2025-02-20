@@ -53,7 +53,7 @@ cp /path/to/your/vault.yaml ~/Downloads/vault.yaml
 ## **📦 Building the macOS VM**
 ### **Run Packer to Build the Image**
 ```sh
-packer build -force templates/vanilla-sonoma.pkr.hcl
+packer build -force moz/mac_v4_signing_ff_prod.pkr.hcl
 ```
 ✅ **This will download necessary files, set up the VM, and run the provisioning steps.**
 
