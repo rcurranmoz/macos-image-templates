@@ -103,21 +103,20 @@ build {
   provisioner "shell" {
     inline = [
 
-      # Install command-line tools
-      "touch /tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress",
-      "softwareupdate --list | sed -n 's/.*Label: \\(Command Line Tools for Xcode-.*\\)/\\1/p' | xargs -I {} softwareupdate --install '{}'",
-      "rm /tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress",
-
       # Ensure Rosetta 2 is installed
-      "if /usr/bin/pgrep oahd >/dev/null 2>&1; then echo 'Rosetta 2 is already installed'; else echo 'Installing Rosetta 2...'; echo admin | sudo -S softwareupdate --install-rosetta --agree-to-license; fi",
+      "if /usr/bin/pgrep oahd >/dev/null 2>&1; then echo 'Rosetta 2 is already installed'; else echo 'Installing Rosetta 2...'; echo admin | sudo -S softwareupdate --install-rosetta --agree-to-license; fi",    
 
       # Enable passwordless sudo for admin
-      "echo 'admin ALL=(ALL) NOPASSWD: ALL' | sudo tee /etc/sudoers.d/admin-nopasswd",
-      "sudo chmod 440 /etc/sudoers.d/admin-nopasswd",
+      "echo admin | sudo -S sh -c 'mkdir -p /etc/sudoers.d/ && echo \"admin ALL=(ALL) NOPASSWD: ALL\" | tee /etc/sudoers.d/admin-nopasswd'",
 
       # Ensure vault.yaml is where bootstrap_mojave.sh expects it
       "echo admin | sudo -S mkdir -p /var/root/",
       "echo admin | sudo -S cp /tmp/vault.yaml /var/root/vault.yaml",
+
+      # Install command-line tools
+      "touch /tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress",
+      "softwareupdate --list | sed -n 's/.*Label: \\(Command Line Tools for Xcode-.*\\)/\\1/p' | xargs -I {} softwareupdate --install '{}'",
+      "rm /tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress",
 
       # Ensure Puppet is installed before running (download from S3)
       "if ! command -v /opt/puppetlabs/bin/puppet &> /dev/null; then echo 'Downloading Puppet from S3...'; curl -o /tmp/puppet-agent-7.28.0-1-installer.pkg https://ronin-puppet-package-repo.s3.us-west-2.amazonaws.com/macos/public/common/puppet-agent-7.28.0-1-installer.pkg && echo 'Installing Puppet...'; echo admin | sudo -S installer -pkg /tmp/puppet-agent-7.28.0-1-installer.pkg -target /; fi",
@@ -126,12 +125,12 @@ build {
       "export PATH=$PATH:/opt/puppetlabs/bin",
 
       # Ensure the Puppet repo is cloned from the correct branch
-      "if [ ! -d /Users/admin/Desktop/puppet/ronin_puppet ]; then echo 'Cloning ronin_puppet repository from master...'; git clone --branch master https://github.com/mozilla-platform-ops/ronin_puppet.git /Users/admin/Desktop/puppet/ronin_puppet; fi",
+      "if [ ! -d /Users/admin/puppet/ronin_puppet ]; then echo 'Cloning ronin_puppet repository...'; git clone --branch master https://github.com/mozilla-platform-ops/ronin_puppet.git /Users/admin/puppet/ronin_puppet; fi",
 
-      # Download bootstrap_mojave.sh from S3
+      # Download bootstrap_mojave_tester.sh from S3
       "echo 'Downloading bootstrap_mojave.sh from S3...'",
       "curl -o /tmp/bootstrap_mojave_tester.sh https://ronin-puppet-package-repo.s3.us-west-2.amazonaws.com/macos/public/common/bootstrap_mojave_tester.sh",
-
+      
       # Ensure the script is executable
       "chmod +x /tmp/bootstrap_mojave_tester.sh",
 
@@ -140,9 +139,7 @@ build {
       "sudo chmod 644 /etc/puppet_role",
 
       # Run the bootstrap script as the last step
-      # At present this fails the first run but the retry
-      # timeout is 60 seconds. It will succeed the second run
-      "echo 'Running bootstrap_mojave.sh...'",
+      "echo 'Running bootstrap_mojave_tester.sh...'",
       "echo admin | sudo -S /tmp/bootstrap_mojave_tester.sh"
     ]
   }
