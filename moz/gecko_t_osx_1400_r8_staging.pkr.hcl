@@ -125,7 +125,7 @@ build {
       "export PATH=$PATH:/opt/puppetlabs/bin",
 
       # Ensure the Puppet repo is cloned from the correct branch
-      "if [ ! -d /Users/admin/puppet/ronin_puppet ]; then echo 'Cloning ronin_puppet repository...'; git clone --branch master https://github.com/mozilla-platform-ops/ronin_puppet.git /Users/admin/puppet/ronin_puppet; fi",
+      "if [ ! -d /Users/admin/Desktop/puppet/ronin_puppet ]; then echo 'Cloning ronin_puppet repository...'; git clone --branch master https://github.com/mozilla-platform-ops/ronin_puppet.git /Users/admin/Desktop/puppet/ronin_puppet; fi",
 
       # Download bootstrap_mojave_tester.sh from S3
       "echo 'Downloading bootstrap_mojave.sh from S3...'",
