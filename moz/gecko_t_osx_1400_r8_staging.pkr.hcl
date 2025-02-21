@@ -135,7 +135,7 @@ build {
       "chmod +x /tmp/bootstrap_mojave_tester.sh",
 
       # Set Puppet role to gecko_t_osx_1400_r8_staging
-      "mkdir -p /etc/facter/facts.d/",
+      "sudo mkdir -p /etc/facter/facts.d/",
       "echo 'gecko_t_osx_1400_r8_staging' | sudo tee /etc/facter/facts.d/puppet_role.txt",
       "echo 'gecko_t_osx_1400_r8_staging' | sudo tee /etc/puppet_role",
       "sudo chmod 644 /etc/puppet_role",
