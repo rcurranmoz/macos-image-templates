@@ -107,7 +107,7 @@ build {
       "if /usr/bin/pgrep oahd >/dev/null 2>&1; then echo 'Rosetta 2 is already installed'; else echo 'Installing Rosetta 2...'; echo admin | sudo -S softwareupdate --install-rosetta --agree-to-license; fi",
 
       # Enable passwordless sudo for admin
-      "echo admin | sudo -S sh -c \"mkdir -p /etc/sudoers.d/; echo 'admin ALL=(ALL) NOPASSWD: ALL' | EDITOR=tee visudo /etc/sudoers.d/admin-nopasswd\",
+      "echo admin | sudo -S sh -c 'mkdir -p /etc/sudoers.d/ && echo \"admin ALL=(ALL) NOPASSWD: ALL\" | tee /etc/sudoers.d/admin-nopasswd'",
 
       # Ensure vault.yaml is where bootstrap_mojave.sh expects it
       "echo admin | sudo -S mkdir -p /var/root/",
