@@ -4,17 +4,12 @@ packer {
       version = ">= 1.12.0"
       source  = "github.com/cirruslabs/tart"
     }
-    ansible = {
-      version = "~> 1"
-      source  = "github.com/hashicorp/ansible"
-    }
   }
 }
 
-source "tart-cli" "tart" {
-  # This can change to a local directory for testing  
+source "tart-cli" "create-base" {
   from_ipsw    = "https://updates.cdn-apple.com/2024SummerFCS/fullrestores/052-69922/F5DA2B64-25EB-4370-9E89-FA5689859796/UniversalMac_14.6_23G80_Restore.ipsw"
-  vm_name      = "sonoma-tester"
+  vm_name      = "sonoma-base"
   cpu_count    = 4
   memory_gb    = 8
   disk_size_gb = 50
@@ -89,60 +84,12 @@ source "tart-cli" "tart" {
 }
 
 build {
-  sources = ["source.tart-cli.tart"]
+  name    = "create-base-image"
+  sources = ["source.tart-cli.create-base"]
 
-  # File provisioners to transfer necessary files
-
-  # For security reasons this will probably remain manual
-  provisioner "file" {
-    source      = "/Users/admin/Downloads/vault.yaml"
-    destination = "/tmp/vault.yaml"
-  }
-
-  # Shell provisioner to configure the system
   provisioner "shell" {
     inline = [
-
-      # Ensure Rosetta 2 is installed
-      "if /usr/bin/pgrep oahd >/dev/null 2>&1; then echo 'Rosetta 2 is already installed'; else echo 'Installing Rosetta 2...'; echo admin | sudo -S softwareupdate --install-rosetta --agree-to-license; fi",    
-
-      # Enable passwordless sudo for admin
-      "echo admin | sudo -S sh -c 'mkdir -p /etc/sudoers.d/ && echo \"admin ALL=(ALL) NOPASSWD: ALL\" | tee /etc/sudoers.d/admin-nopasswd'",
-
-      # Ensure vault.yaml is where bootstrap_mojave.sh expects it
-      "echo admin | sudo -S mkdir -p /var/root/",
-      "echo admin | sudo -S cp /tmp/vault.yaml /var/root/vault.yaml",
-
-      # Install command-line tools
-      "touch /tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress",
-      "softwareupdate --list | sed -n 's/.*Label: \\(Command Line Tools for Xcode-.*\\)/\\1/p' | xargs -I {} softwareupdate --install '{}'",
-      "rm /tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress",
-
-      # Ensure Puppet is installed before running (download from S3)
-      "if ! command -v /opt/puppetlabs/bin/puppet &> /dev/null; then echo 'Downloading Puppet from S3...'; curl -o /tmp/puppet-agent-7.28.0-1-installer.pkg https://ronin-puppet-package-repo.s3.us-west-2.amazonaws.com/macos/public/common/puppet-agent-7.28.0-1-installer.pkg && echo 'Installing Puppet...'; echo admin | sudo -S installer -pkg /tmp/puppet-agent-7.28.0-1-installer.pkg -target /; fi",
-
-      # Ensure Puppet is in the PATH
-      "export PATH=$PATH:/opt/puppetlabs/bin",
-
-      # Ensure the Puppet repo is cloned from the correct branch
-      "if [ ! -d /Users/admin/Desktop/puppet/ronin_puppet ]; then echo 'Cloning ronin_puppet repository...'; git clone --branch master https://github.com/mozilla-platform-ops/ronin_puppet.git /Users/admin/Desktop/puppet/ronin_puppet; fi",
-
-      # Download bootstrap_mojave_tester.sh from S3
-      "echo 'Downloading bootstrap_mojave.sh from S3...'",
-      "curl -o /tmp/bootstrap_mojave_tester.sh https://ronin-puppet-package-repo.s3.us-west-2.amazonaws.com/macos/public/common/bootstrap_mojave_tester.sh",
-      
-      # Ensure the script is executable
-      "chmod +x /tmp/bootstrap_mojave_tester.sh",
-
-      # Set Puppet role to gecko_t_osx_1400_r8_staging
-      "sudo mkdir -p /etc/facter/facts.d/",
-      "echo 'gecko_t_osx_1400_r8_staging' | sudo tee /etc/facter/facts.d/puppet_role.txt",
-      "echo 'gecko_t_osx_1400_r8_staging' | sudo tee /etc/puppet_role",
-      "sudo chmod 644 /etc/puppet_role",
-
-      # Run the bootstrap script as the last step
-      "echo 'Running bootstrap_mojave_tester.sh...'",
-      "echo admin | sudo -S /tmp/bootstrap_mojave_tester.sh"
+      "echo 'Base macOS image has been created with an admin account. Ready for SIP disable step.'"
     ]
   }
 }
