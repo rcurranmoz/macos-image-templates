@@ -41,7 +41,7 @@ Ensure **Tart is working**:
 tart --version
 ```
 
-### **5️⃣ Prepare Vault Configuration**
+### **4 Prepare Vault Configuration**
 For security reasons, you **must manually provide a `vault.yaml` file**:
 ```sh
 cp /path/to/your/vault.yaml ~/Downloads/vault.yaml
