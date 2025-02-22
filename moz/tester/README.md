@@ -9,6 +9,39 @@ This repository contains Packer templates to automate the provisioning of macOS 
 
 ---
 
+## **🛠 Prerequisites**
+### **1️⃣ Install Packer**
+Ensure you have **Packer installed**:
+```sh
+brew install hashicorp/tap/packer
+```
+
+### **2️⃣ Install Required Packer Plugins**
+Run the following commands to install the necessary **Packer plugins**:
+```sh
+packer plugins install github.com/hashicorp/ansible
+packer plugins install github.com/cirruslabs/tart
+```
+
+### **3️⃣ Install Tart**
+Tart is required to run macOS virtual machines:
+```sh
+brew install cirruslabs/cli/tart
+```
+Ensure **Tart is working**:
+```sh
+tart --version
+```
+
+### **5️⃣ Prepare Vault Configuration**
+For security reasons, you **must manually provide a `vault.yaml` file**:
+```sh
+cp /path/to/your/vault.yaml ~/Downloads/vault.yaml
+```
+✅ **Ensure `vault.yaml` is placed in `/Users/admin/Downloads/` before running Packer.**
+
+---
+
 ## 🛠 Setup Instructions
 
 ### 1️⃣ **Create Base macOS Image**
@@ -37,7 +70,7 @@ This step:
 ✅ Runs `csrutil disable`  
 ✅ Shuts down the system  
 
-⚠ **Known Issue**: This step currently requires manual intervention. The VM may hang on a black screen. If this happens, manually force reboot and rerun the step.
+⚠ **Known Issue**: This step currently requires manual intervention. The VM may hang on a black screen. If this happens, give the vm about a minute and try to click to 'wake' it up
 
 ---
 
@@ -45,7 +78,7 @@ This step:
 After disabling SIP, run Puppet to apply system configurations:
 
 ```sh
-packer build -force -var="vm_name=sonoma-sip-disabled" templates/puppet-setup.pkr.hcl
+packer build -force -var="vm_name=sonoma-base" moz/tester/puppet-setup.pkr.hcl
 ```
 
 This step:  
@@ -60,7 +93,7 @@ This step:
 
 ## 🐛 **Known Bugs & Issues**
 1. **Disabling SIP Requires Manual Intervention**  
-   - The VM may hang during the SIP step. You may need to manually reboot the VM and retry.
+   - The VM may hang during the SIP step. You may need to manually "wake" it up.
 
 2. **Puppet Does Not Apply All Role Configurations**  
    - `ronin_puppet/data/roles/gecko_t_osx_1400_r8_staging.yaml` is not fully applied.  
@@ -93,3 +126,4 @@ sudo /opt/puppetlabs/bin/puppet apply --modulepath=/Users/admin/Desktop/puppet/r
 ## 🚀 **Conclusion**
 This process automates macOS VM creation, SIP disabling, and provisioning with Puppet. While functional, improvements are needed to eliminate manual intervention and ensure all role configurations are properly applied.
 
+ d
