@@ -92,17 +92,16 @@ This step:
 ---
 
 ## 🐛 **Known Bugs & Issues**
-1. **Disabling SIP Requires Manual Intervention**  
-   - The VM may hang during the SIP step. You may need to manually "wake" it up.
 
-2. **Puppet Does Not Apply All Role Configurations**  
+1. **Puppet Does Not Apply All Role Configurations**  
    - `ronin_puppet/data/roles/gecko_t_osx_1400_r8_staging.yaml` is not fully applied.  
    - Some configurations and packages are not getting picked up correctly.  
+
 
 ---
 
 ## ✅ **Next Steps**
-- Automate SIP disabling to eliminate manual intervention.  
+- Add dynamic naming of vm's (maybe by serial, uuid, etc). Taskcluster doesnt like vms named the same thing.
 - Ensure Puppet applies all role configurations and package installations.  
 - Implement additional validation steps for package installation.  
 
@@ -125,5 +124,3 @@ sudo /opt/puppetlabs/bin/puppet apply --modulepath=/Users/admin/Desktop/puppet/r
 
 ## 🚀 **Conclusion**
 This process automates macOS VM creation, SIP disabling, and provisioning with Puppet. While functional, improvements are needed to eliminate manual intervention and ensure all role configurations are properly applied.
-
- d
