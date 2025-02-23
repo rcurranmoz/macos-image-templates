@@ -89,9 +89,10 @@ build {
       "curl -o /tmp/bootstrap_mojave_tester.sh https://ronin-puppet-package-repo.s3.us-west-2.amazonaws.com/macos/public/common/bootstrap_mojave_tester.sh",
       "chmod +x /tmp/bootstrap_mojave_tester.sh",
 
-      "echo 'Temporarily commenting out macos_tcc_perms and safaridriver in role manifest...'",
+      "echo 'Temporarily commenting out macos_tcc_perms, safaridriver, and macos_directory_cleaner in role manifest...'",
       "sudo sed -i '.bak' '/macos_tcc_perms/s/^/#/' /Users/admin/Desktop/puppet/ronin_puppet/modules/roles_profiles/manifests/roles/gecko_t_osx_1400_r8_staging.pp",
       "sudo sed -i '.bak' '/safaridriver/s/^/#/' /Users/admin/Desktop/puppet/ronin_puppet/modules/roles_profiles/manifests/roles/gecko_t_osx_1400_r8_staging.pp",
+      "sudo sed -i '.bak' '/macos_directory_cleaner/s/^/#/' /Users/admin/Desktop/puppet/ronin_puppet/modules/roles_profiles/manifests/roles/gecko_t_osx_1400_r8_staging.pp",
 
      "echo 'Running bootstrap_mojave_tester.sh (first attempt)...'",
       "if ! (echo admin | sudo -S /tmp/bootstrap_mojave_tester.sh); then",

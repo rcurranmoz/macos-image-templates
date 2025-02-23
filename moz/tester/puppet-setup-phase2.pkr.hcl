@@ -42,9 +42,11 @@ build {
       "  chmod +x /tmp/bootstrap_mojave_tester.sh",
       "fi",
 
-      "echo 'Restoring macos_tcc_perms and safaridriver in role manifest...'",
-      "sudo mv /Users/admin/Desktop/puppet/ronin_puppet/modules/roles_profiles/manifests/roles/gecko_t_osx_1400_r8_staging.pp.bak /Users/admin/Desktop/puppet/ronin_puppet/modules/roles_profiles/manifests/roles/gecko_t_osx_1400_r8_staging.pp",
-
+      "echo 'Restoring macos_tcc_perms, safaridriver, and macos_directory_cleaner in role manifest...'",
+      "sudo sed -i '.bak' '/#.*macos_tcc_perms/s/^#//' /Users/admin/Desktop/puppet/ronin_puppet/modules/roles_profiles/manifests/roles/gecko_t_osx_1400_r8_staging.pp",
+      "sudo sed -i '.bak' '/#.*safaridriver/s/^#//' /Users/admin/Desktop/puppet/ronin_puppet/modules/roles_profiles/manifests/roles/gecko_t_osx_1400_r8_staging.pp",
+      "sudo sed -i '.bak' '/#.*macos_directory_cleaner/s/^#//' /Users/admin/Desktop/puppet/ronin_puppet/modules/roles_profiles/manifests/roles/gecko_t_osx_1400_r8_staging.pp",
+      
       "echo 'Re-running bootstrap_mojave_tester.sh (second attempt after reboot)...'",
       "echo admin | sudo -S /tmp/bootstrap_mojave_tester.sh || echo 'Puppet run completed with errors, but continuing...'",
 
