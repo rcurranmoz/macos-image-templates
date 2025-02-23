@@ -1,126 +1,93 @@
-# macOS Packer Build Process
+# macOS CI Automation - Packer + Tart
 
-## Overview
-This repository contains Packer templates to automate the provisioning of macOS virtual machines using [Tart](https://github.com/cirruslabs/tart). The process is split into three main phases:
+This project automates the provisioning of macOS virtual machines for CI using **Packer** and **Tart**. The process consists of **four phases**, ensuring a fully configured system with Puppet.
 
-1. **Create the Base macOS Image**: Installs a fresh macOS from an IPSW file and configures an admin account.
-2. **Disable System Integrity Protection (SIP)**: Boots into macOS Recovery Mode and disables SIP.
-3. **Run Puppet & Provision System**: Configures the system, installs necessary software, and applies Puppet manifests.
+## 🚀 Overview of the Build Process
 
----
+1. **Create Base Image** - Installs macOS from IPSW and configures the initial admin account.
+2. **Disable SIP** - Boots into macOS recovery and disables System Integrity Protection (SIP).
+3. **Puppet Setup Phase 1** - Runs Puppet with a subset of configurations (TCC/SafariDriver excluded).
+4. **Puppet Setup Phase 2** - Re-runs Puppet after a reboot to apply TCC and SafariDriver settings.
 
-## **🛠 Prerequisites**
-### **1️⃣ Install Packer**
-Ensure you have **Packer installed**:
-```sh
-brew install hashicorp/tap/packer
-```
+## 🔧 Prerequisites
 
-### **2️⃣ Install Required Packer Plugins**
-Run the following commands to install the necessary **Packer plugins**:
-```sh
-packer plugins install github.com/hashicorp/ansible
-packer plugins install github.com/cirruslabs/tart
-```
+- Install **Packer**: https://developer.hashicorp.com/packer/downloads
+- Install **Tart**: https://github.com/cirruslabs/tart
+- Ensure you have **Packer plugins** installed:
+  ```sh
+  packer plugins install github.com/cirruslabs/tart
+  ```
+- **AWS S3 access** (for downloading Puppet and scripts).
+- **Ensure the `vault.yaml` file** is available in `/Users/admin/Downloads/`.
 
-### **3️⃣ Install Tart**
-Tart is required to run macOS virtual machines:
-```sh
-brew install cirruslabs/cli/tart
-```
-Ensure **Tart is working**:
-```sh
-tart --version
-```
+## 🛠 Running the Full Build
 
-### **4️⃣  Prepare Vault Configuration**
-For security reasons, you **must manually provide a `vault.yaml` file**:
-```sh
-cp /path/to/your/vault.yaml ~/Downloads/vault.yaml
-```
-✅ **Ensure `vault.yaml` is placed in `/Users/admin/Downloads/` before running Packer.**
-
----
-
-## 🛠 Setup Instructions
-
-### 1️⃣ **Create Base macOS Image**
-Run the following command to create a fresh macOS image:
+To execute all steps automatically, **run the `builder.sh` script**:
 
 ```sh
-packer build moz/tester/create-base.pkr.hcl
+cd tester/
+chmod +x builder.sh
+./builder.sh
 ```
 
-This step:
-✅ Installs macOS from an IPSW file  
-✅ Configures the initial admin account  
-✅ Prepares the system for SIP disabling  
-
----
-
-### 2️⃣ **Disable SIP (System Integrity Protection)**
-Once the base image is created, disable SIP using:
-
+This script will execute:
 ```sh
-packer build -var="vm_name=sonoma-base" moz/tester/disable-sip.pkr.hcl
+packer build -force create-base.pkr.hcl;
+packer build -force -var="vm_name=sonoma-base" disable-sip.pkr.hcl;
+packer build -force -var="vm_name=sonoma-base" puppet-setup-phase1.pkr.hcl;
+packer build -force -var="vm_name=sonoma-base" puppet-setup-phase2.pkr.hcl;
 ```
 
-This step:  
-✅ Boots into macOS Recovery Mode  
-✅ Runs `csrutil disable`  
-✅ Shuts down the system  
+## 📜 Phase Breakdown
 
-⚠ **Known Issue**: This step currently requires manual intervention. The VM may hang on a black screen. If this happens, give the vm about a minute and try to click to 'wake' it up
+### 1️⃣ Create Base Image
+- Installs macOS from IPSW.
+- Creates an admin user (`admin`).
+- Enables SSH access.
 
----
+### 2️⃣ Disable SIP
+- Boots into **macOS Recovery Mode**.
+- Disables **System Integrity Protection (SIP)**.
+- Reboots back to macOS.
 
-### 3️⃣ **Run Puppet & Fully Provision the System**
-After disabling SIP, run Puppet to apply system configurations:
+### 3️⃣ Puppet Setup Phase 1
+- Installs necessary dependencies (Rosetta, Xcode CLT, Puppet).
+- Clones **ronin_puppet** repo.
+- **Runs Puppet with TCC and SafariDriver temporarily disabled**.
+- **Reboots after the first run**.
 
+### 4️⃣ Puppet Setup Phase 2
+- **Restores TCC & SafariDriver modules**.
+- Runs Puppet **again** to apply full configurations.
+- Ensures a **clean exit**.
+
+## 🔥 Key Workarounds & Fixes
+
+### 🛑 Fixing TCC Permissions & SafariDriver
+- These modules **must be disabled** on the first Puppet run.
+- They are **re-enabled after reboot** in Phase 2.
+
+### 🔄 Ensuring Clean Reboots
+- The **first Puppet run fails** (expected) due to missing users (`cltbld`).
+- **We catch the failure and trigger a reboot**.
+- The **second run finalizes** all remaining configs.
+
+## ❌ Troubleshooting
+
+### 1️⃣ Stuck on Accessibility or Welcome Screens
+- Ensure `Disable Setup Assistant` step is applied in Puppet.
+
+### 2️⃣ Puppet Not Applying Correctly?
 ```sh
-packer build -force -var="vm_name=sonoma-base" moz/tester/puppet-setup.pkr.hcl
+sudo /opt/puppetlabs/bin/puppet agent --test --debug
 ```
 
-This step:  
-✅ Ensures `Rosetta 2` is installed  
-✅ Installs Command Line Tools  
-✅ Downloads and installs `Puppet` from S3  
-✅ Clones the `ronin_puppet` repository  
-✅ Runs `bootstrap_mojave_tester.sh` to apply configurations  
-✅ Reboots if necessary to finalize the setup  
-
----
-
-## 🐛 **Known Bugs & Issues**
-
-1. **Puppet Does Not Apply All Role Configurations**  
-   - `ronin_puppet/data/roles/gecko_t_osx_1400_r8_staging.yaml` is not fully applied.  
-   - Some configurations and packages are not getting picked up correctly.  
-
-
----
-
-## ✅ **Next Steps**
-- Add dynamic naming of vm's (maybe by serial, uuid, etc). Taskcluster doesnt like vms named the same thing.
-- Ensure Puppet applies all role configurations and package installations.  
-- Implement additional validation steps for package installation.  
-
----
-
-### **🔧 Debugging**
-To manually check SIP status, SSH into the VM and run:
-
+### 3️⃣ Verifying SIP Status
 ```sh
 csrutil status
 ```
 
-To manually run Puppet:
-
-```sh
-sudo /opt/puppetlabs/bin/puppet apply --modulepath=/Users/admin/Desktop/puppet/ronin_puppet/modules:/etc/puppetlabs/code/environments/production/modules --hiera_config=/Users/admin/Desktop/puppet/ronin_puppet/hiera.yaml --logdest=console --color=false --detailed-exitcodes /Users/admin/Desktop/puppet/ronin_puppet/manifests/
-```
-
----
-
-## 🚀 **Conclusion**
-This process automates macOS VM creation, SIP disabling, and provisioning with Puppet. While functional, improvements are needed to eliminate manual intervention and ensure all role configurations are properly applied.
+## 🎉 Next Steps
+- Validate builds in the CI pipeline.
+- Expand support for **multiple macOS versions**.
+- Automate VM name assignment dynamically.
