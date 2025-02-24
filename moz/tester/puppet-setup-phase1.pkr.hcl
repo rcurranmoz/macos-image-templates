@@ -10,7 +10,7 @@ packer {
 # Define a variable for VM name (allows dynamic selection)
 variable "vm_name" {
   type    = string
-  default = "sonoma-base"  # Default to the SIP-disabled VM
+  default = "sonoma-base"
 }
 
 source "tart-cli" "puppet-setup-phase1" {

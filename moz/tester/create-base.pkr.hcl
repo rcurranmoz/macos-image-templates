@@ -94,6 +94,8 @@ build {
   provisioner "shell" {
     inline = [
 
+      # At this stage both of these steps are required for the ansible updater to work
+
       "echo 'Enabling passwordless sudo for admin...'",
       "echo admin | sudo -S sh -c 'mkdir -p /etc/sudoers.d/ && echo \"admin ALL=(ALL) NOPASSWD: ALL\" | tee /etc/sudoers.d/admin-nopasswd'",
       
