@@ -80,8 +80,8 @@ build {
 
       # Set Puppet role
       "sudo mkdir -p /etc/facter/facts.d/",
-      "echo 'gecko_t_osx_1400_r8_staging' | sudo tee /etc/facter/facts.d/puppet_role.txt",
-      "echo 'gecko_t_osx_1400_r8_staging' | sudo tee /etc/puppet_role",
+      "echo 'gecko_t_osx_1400_m_vms' | sudo tee /etc/facter/facts.d/puppet_role.txt",
+      "echo 'gecko_t_osx_1400_m_vms' | sudo tee /etc/puppet_role",
       "sudo chmod 644 /etc/puppet_role",
 
       # Download bootstrap script
@@ -90,9 +90,9 @@ build {
       "chmod +x /tmp/bootstrap_mojave_tester.sh",
 
       "echo 'Temporarily commenting out macos_tcc_perms, safaridriver, and macos_directory_cleaner in role manifest...'",
-      "sudo sed -i '.bak' '/macos_tcc_perms/s/^/#/' /Users/admin/Desktop/puppet/ronin_puppet/modules/roles_profiles/manifests/roles/gecko_t_osx_1400_r8_staging.pp",
-      "sudo sed -i '.bak' '/safaridriver/s/^/#/' /Users/admin/Desktop/puppet/ronin_puppet/modules/roles_profiles/manifests/roles/gecko_t_osx_1400_r8_staging.pp",
-      "sudo sed -i '.bak' '/macos_directory_cleaner/s/^/#/' /Users/admin/Desktop/puppet/ronin_puppet/modules/roles_profiles/manifests/roles/gecko_t_osx_1400_r8_staging.pp",
+      "sudo sed -i '.bak' '/macos_tcc_perms/s/^/#/' /Users/admin/Desktop/puppet/ronin_puppet/modules/roles_profiles/manifests/roles/gecko_t_osx_1400_m_vms.pp",
+      "sudo sed -i '.bak' '/safaridriver/s/^/#/' /Users/admin/Desktop/puppet/ronin_puppet/modules/roles_profiles/manifests/roles/gecko_t_osx_1400_m_vms.pp",
+      "sudo sed -i '.bak' '/macos_directory_cleaner/s/^/#/' /Users/admin/Desktop/puppet/ronin_puppet/modules/roles_profiles/manifests/roles/gecko_t_osx_1400_m_vms.pp",
 
      "echo 'Running bootstrap_mojave_tester.sh (first attempt)...'",
       "if ! (echo admin | sudo -S /tmp/bootstrap_mojave_tester.sh); then",
