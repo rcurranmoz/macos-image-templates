@@ -4,6 +4,10 @@ packer {
       version = ">= 1.12.0"
       source  = "github.com/cirruslabs/tart"
     }
+    ansible = {
+      version = "~> 1"
+      source = "github.com/hashicorp/ansible"
+    }
   }
 }
 
@@ -89,7 +93,27 @@ build {
 
   provisioner "shell" {
     inline = [
-      "echo 'Base macOS image has been created with an admin account. Ready for SIP disable step.'"
+
+      "echo 'Enabling passwordless sudo for admin...'",
+      "echo admin | sudo -S sh -c 'mkdir -p /etc/sudoers.d/ && echo \"admin ALL=(ALL) NOPASSWD: ALL\" | tee /etc/sudoers.d/admin-nopasswd'",
+      
+      # Install command-line tools
+      "touch /tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress",
+      "softwareupdate --list | sed -n 's/.*Label: \\(Command Line Tools for Xcode-.*\\)/\\1/p' | xargs -I {} softwareupdate --install '{}'",
+      "rm /tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress",
+
+      "echo 'Base macOS image has been created with an admin account and Xcode Command Line Tools installed. Ready for SIP disable step.'",
     ]
+  }
+  provisioner "ansible" {
+    playbook_file = "../../ansible/playbook-system-updater.yml"
+    extra_arguments = [
+      "-vvv",
+    ]
+    ansible_env_vars = [
+      "ANSIBLE_TRANSPORT=paramiko",
+      "ANSIBLE_HOST_KEY_CHECKING=False",
+    ]
+    use_proxy = false
   }
 }
