@@ -78,11 +78,60 @@ build {
       "  git clone --branch master https://github.com/mozilla-platform-ops/ronin_puppet.git /Users/admin/Desktop/puppet/ronin_puppet",
       "fi",
 
-      # Set Puppet role
-      "sudo mkdir -p /etc/facter/facts.d/",
-      "echo 'gecko_t_osx_1400_m_vms' | sudo tee /etc/facter/facts.d/puppet_role.txt",
-      "echo 'gecko_t_osx_1400_m_vms' | sudo tee /etc/puppet_role",
+      "echo 'Modifying hiera.yaml to include local vault path...'",
+      "sudo tee /Users/admin/Desktop/puppet/ronin_puppet/hiera.yaml > /dev/null << 'EOF'",
+      "---",
+      "version: 5",
+      "defaults:",
+      "  data_hash: yaml_data",
+      "  datadir: data",
+      "",
+      "hierarchy:",
+      "  - name: \"local\"",
+      "    path: \"/var/root/vault.yaml\"",
+      "",
+      "  - name: \"Per-role data\"",
+      "    path: \"roles/%%{facts.puppet_role}.yaml\"",
+      "",
+      "  - name: \"Per-role Windows\"",
+      "    path: \"roles/%%{facts.custom_win_role}.yaml\"",
+      "",
+      "  - name: \"Per-OS defaults\"",
+      "    path: \"os/%%{facts.os.family}.yaml\"",
+      "",
+      "  - name: \"Secrets generated from Vault\"",
+      "    path: \"secrets/vault.yaml\"",
+      "",
+      "  - name: \"Common data to all\"",
+      "    path: \"common.yaml\"",
+      "EOF",
+
+      # Ensure /etc/facter/facts.d exists
+      "echo admin | sudo -S mkdir -p /etc/facter/facts.d/",
+
+      # Set Puppet role and ensure it's readable
+      "echo 'puppet_role=gecko_t_osx_1400_m_vms' | sudo tee /etc/facter/facts.d/puppet_role.txt > /dev/null",
+      "sudo chmod 644 /etc/facter/facts.d/puppet_role.txt",
+
+      # Ensure /etc/puppet_role exists and matches Facter
+      "echo 'gecko_t_osx_1400_m_vms' | sudo tee /etc/puppet_role > /dev/null",
       "sudo chmod 644 /etc/puppet_role",
+
+      # Remove Facter cache to force reload
+      "echo admin | sudo -S rm -rf /opt/puppetlabs/facter/cache/",
+
+      # Verify fact is correctly set
+      "echo 'Verifying puppet_role fact...'",
+      "sudo /opt/puppetlabs/bin/facter puppet_role",
+
+      # Verify /etc/puppet_role exists before continuing
+      "if [ ! -f /etc/puppet_role ]; then",
+      "  echo 'ERROR: /etc/puppet_role was not created. Exiting...'",
+      "  exit 1",
+      "fi",
+
+      # Small delay to ensure Facter fully loads the new fact
+      "sleep 3",
 
       # Download bootstrap script
       "echo 'Downloading bootstrap_mojave_tester.sh...'",
@@ -93,6 +142,7 @@ build {
       "sudo sed -i '.bak' '/macos_tcc_perms/s/^/#/' /Users/admin/Desktop/puppet/ronin_puppet/modules/roles_profiles/manifests/roles/gecko_t_osx_1400_m_vms.pp",
       "sudo sed -i '.bak' '/safaridriver/s/^/#/' /Users/admin/Desktop/puppet/ronin_puppet/modules/roles_profiles/manifests/roles/gecko_t_osx_1400_m_vms.pp",
       "sudo sed -i '.bak' '/macos_directory_cleaner/s/^/#/' /Users/admin/Desktop/puppet/ronin_puppet/modules/roles_profiles/manifests/roles/gecko_t_osx_1400_m_vms.pp",
+      "sudo sed -i '.bak' '/pipconf/s/^/#/' /Users/admin/Desktop/puppet/ronin_puppet/modules/roles_profiles/manifests/roles/gecko_t_osx_1400_m_vms.pp",
 
      "echo 'Running bootstrap_mojave_tester.sh (first attempt)...'",
       "if ! (echo admin | sudo -S /tmp/bootstrap_mojave_tester.sh); then",
